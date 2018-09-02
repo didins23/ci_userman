@@ -1,0 +1,151 @@
+<?php
+
+if (!defined('BASEPATH'))
+    exit('No direct script access allowed');
+
+class Limit_Radgroupreply extends CI_Controller
+{
+    function __construct()
+    {
+        parent::__construct();
+        is_login();
+        $this->load->model('Limit_Radgroupreply_model');
+        $this->load->library('form_validation');        
+	$this->load->library('datatables');
+    }
+
+    public function index()
+    {
+        $this->template->load('template','limit_radgroupreply/radgroupreply_list');
+    } 
+    
+    public function json() {
+        header('Content-Type: application/json');
+        echo $this->Limit_Radgroupreply_model->json();
+    }
+
+    public function read($id) 
+    {
+        $row = $this->Limit_Radgroupreply_model->get_by_id($id);
+        if ($row) {
+            $data = array(
+		'id' => $row->id,
+		'groupname' => $row->groupname,
+		'attribute' => $row->attribute,
+		'op' => $row->op,
+		'value' => $row->value,
+	    );
+            $this->template->load('template','limit_radgroupreply/radgroupreply_read', $data);
+        } else {
+            $this->session->set_flashdata('message', 'Record Not Found');
+            redirect(site_url('limit_radgroupreply'));
+        }
+    }
+
+    public function create() 
+    {
+        $data = array(
+            'button' => 'Create',
+            'action' => site_url('limit_radgroupreply/create_action'),
+	    'id' => set_value('id'),
+	    'groupname' => set_value('groupname'),
+	    'attribute' => set_value('attribute'),
+	    'op' => set_value('op'),
+	    'value' => set_value('value'),
+	);
+        $this->template->load('template','limit_radgroupreply/radgroupreply_form', $data);
+    }
+    
+    public function create_action() 
+    {
+        $this->_rules();
+
+        if ($this->form_validation->run() == FALSE) {
+            $this->create();
+        } else {
+            $data = array(
+		'groupname' => $this->input->post('groupname',TRUE),
+		'attribute' => $this->input->post('attribute',TRUE),
+		'op' => $this->input->post('op',TRUE),
+		'value' => $this->input->post('value',TRUE),
+	    );
+
+            $this->Limit_Radgroupreply_model->insert($data);
+            $this->session->set_flashdata('message', 'Create Record Success 2');
+            redirect(site_url('limit_radgroupreply'));
+        }
+    }
+    
+    public function update($id) 
+    {
+        $row = $this->Limit_Radgroupreply_model->get_by_id($id);
+
+        if ($row) {
+            $data = array(
+                'button' => 'Update',
+                'action' => site_url('limit_radgroupreply/update_action'),
+		'id' => set_value('id', $row->id),
+		'groupname' => set_value('groupname', $row->groupname),
+		'attribute' => set_value('attribute', $row->attribute),
+		'op' => set_value('op', $row->op),
+		'value' => set_value('value', $row->value),
+	    );
+            $this->template->load('template','limit_radgroupreply/radgroupreply_form', $data);
+        } else {
+            $this->session->set_flashdata('message', 'Record Not Found');
+            redirect(site_url('limit_radgroupreply'));
+        }
+    }
+    
+    public function update_action() 
+    {
+        $this->_rules();
+
+        if ($this->form_validation->run() == FALSE) {
+            $this->update($this->input->post('id', TRUE));
+        } else {
+            $data = array(
+		'groupname' => $this->input->post('groupname',TRUE),
+		'attribute' => $this->input->post('attribute',TRUE),
+		'op' => $this->input->post('op',TRUE),
+		'value' => $this->input->post('value',TRUE),
+	    );
+
+            $this->Limit_Radgroupreply_model->update($this->input->post('id', TRUE), $data);
+            $this->session->set_flashdata('message', 'Update Record Success');
+            redirect(site_url('limit_radgroupreply'));
+        }
+    }
+    
+    public function delete($id) 
+    {
+        $row = $this->Limit_Radgroupreply_model->get_by_id($id);
+
+        if ($row) {
+            $this->Limit_Radgroupreply_model->delete($id);
+            $this->session->set_flashdata('message', 'Delete Record Success');
+            redirect(site_url('limit_radgroupreply'));
+        } else {
+            $this->session->set_flashdata('message', 'Record Not Found');
+            redirect(site_url('limit_radgroupreply'));
+        }
+    }
+
+    public function _rules() 
+    {
+	$this->form_validation->set_rules('groupname', 'groupname', 'trim|required');
+	$this->form_validation->set_rules('attribute', 'attribute', 'trim|required');
+	$this->form_validation->set_rules('op', 'op', 'trim|required');
+	$this->form_validation->set_rules('value', 'value', 'trim|required');
+
+	$this->form_validation->set_rules('id', 'id', 'trim');
+	$this->form_validation->set_error_delimiters('<span class="text-danger">', '</span>');
+    }
+
+}
+
+/* End of file Limit_Radgroupreply.php */
+/* Location: ./application/controllers/Limit_Radgroupreply.php */
+/* Please DO NOT modify this information : */
+/* Generated by Harviacode Codeigniter CRUD Generator 2018-09-01 22:08:19 */
+/* http://harviacode.com */
